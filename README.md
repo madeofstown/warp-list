@@ -28,7 +28,7 @@ Also includes trans-dimension teleport function and Playerlist Map API.
 ### Example: Have NetworkID and want Entity
 
 ```
-import {connectionList} from "@bdsx/warp-list/playerlist."
+import {connectionList} from "@bdsx/warp-list/playerlist"
 
 let name = connectionList.nXNet.get(NetworkID)
 let entity = connectionList.n2Ent.get(name)
