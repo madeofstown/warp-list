@@ -28,7 +28,7 @@ let tdtp: boolean = false
 
 // Open PDB and look for teleport function
 pdb.setOptions(SYMOPT_UNDNAME);
-const hacker = ProcHacker.load("../node_modules/@bdsx/warp-list/pdbcache.ini", [
+const hacker = ProcHacker.load(`${__dirname}/pdbcache.ini`, [
     "TeleportCommand::teleport"
 ]);
 pdb.setOptions(0);

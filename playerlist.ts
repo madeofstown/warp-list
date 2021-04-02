@@ -9,10 +9,6 @@
 //           Name -> NetworkID AND NetworkID -> for each active player          //
 //                  (removes players from map when they leave)                  //
 //------------------------------------------------------------------------------//
-//                          Required Custom Scripts:                            //
-//                        playerlist.ts/playerlist.js                           //
-//                             forms.ts/forms.js                                //
-//------------------------------------------------------------------------------//
 
 import { Actor, nethook, NetworkIdentifier, PacketId } from "bdsx";
 import colors = require('colors');
