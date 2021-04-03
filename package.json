@@ -1,26 +1,25 @@
 {
-  "name": "@bdsx/warp-list",
-  "version": "1.1.1",
+  "name": "@rndmm.us/warp-list",
+  "version": "1.1.2",
   "description": "A warp point system for BDSX. Trans-dimension teleport function and Playerlist Map API included.",
   "main": "index.js",
   "keywords": [],
-  "author": "madeofstown",
+  "author": "madeofstown@rndmm.us",
   "license": "BSD",
-  "bdsxPlugin": true,
-  "declaration": true,
   "homepage": "https://github.com/randommouse/warp-list.git#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/randommouse/warp-list.git"
   },
+  "bdsxPlugin": true,
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
     "prepare": "tsc"
   },
   "devDependencies": {
-    "bdsx": "file:../../bdsx",
     "@types/node": "^12.20.5",
+    "bdsx": "file:../../bdsx_latest/bdsx",
     "typescript": "^4.2.3"
   },
   "dependencies": {
