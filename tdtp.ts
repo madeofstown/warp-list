@@ -22,12 +22,12 @@ import { ProcHacker } from "bdsx/prochacker";
 import { Actor, command, DimensionId, RawTypeId } from "bdsx";
 import { RelativeFloat, Vec3 } from "bdsx/bds/blockpos";
 import { connectionList } from "./playerlist";
-import { ActorWildcardCommandSelector } from "bdsx/bds/command";
+import { ActorWildcardCommandSelector, CommandPermissionLevel } from "bdsx/bds/command";
 import { int32_t } from "bdsx/nativetype";
 import { relative } from "node:path";
 
 // Set to 'true' to enable '/tdtp' command
-let tdtp: boolean = true
+let tdtp: boolean = false
 
 // Open PDB and look for teleport function
 pdb.setOptions(SYMOPT_UNDNAME);
@@ -58,25 +58,11 @@ export function tdTeleport(actor: Actor, x:{value:number, is_relative?: boolean}
     _tdtp(actor, pos, new Vec3(true), dimId);
 }
 
-
-// Hooking '/tdtp <dimId:{0=overworld, 1=nether, 2=end}> <xPos> <yPos> <zPos>' command
-// if (tdtp == true) {
-//     command.hook.on((command, originName) => {
-//         if (command.startsWith('/tdtp')){
-//             let cmdData = command.split(' ');
-//             let dimId = parseInt(cmdData[1]);
-//             let xPos: number = parseFloat(cmdData[2]);
-//             let yPos: number = parseFloat(cmdData[3]);
-//             let zPos: number = parseFloat(cmdData[4]);
-//             console.log('[COMMAND HOOK] /tdtp ' + dimId + ' ' + xPos + ' ' + yPos + ' ' + zPos + ' @' + originName);
-//             tdTeleport(originName, dimId, xPos, yPos, zPos);
-//             return 0;
-//         }
-//     });
-// }
-command.register('tdtp', 'Trans-dimension teleportation').overload((param, origin, output) => {
-    console.log(origin);
-    for (const actor of param.target.newResults(origin)) {
-        tdTeleport(actor, param.x, param.y, param.z, param.dimensionID); 
-    }
-}, {target: ActorWildcardCommandSelector, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, dimensionID: int32_t});
+if (tdtp != false){
+    command.register('tdtp', 'Trans-dimension teleportation', 1).overload((param, origin, output) => {
+        console.log(origin);
+        for (const actor of param.target.newResults(origin)) {
+            tdTeleport(actor, param.x, param.y, param.z, param.dimensionID); 
+        }
+    }, {target: ActorWildcardCommandSelector, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, dimensionID: int32_t});
+}

@@ -13,7 +13,7 @@ Also includes trans-dimension teleport function and Playerlist Map API.
 * `/home` - teleport to '§5HOME'
 
 ## Disabled Command (change variable in tdtp.js to enable)
-* `/tdtp dimID x y z ` - trans-dimension teleport. 
+* `/tdtp target x y z dimID` - trans-dimension teleport. 
 * `dimID`
   * 0 = Overworld
   * 1 = Nether
