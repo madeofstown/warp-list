@@ -19,12 +19,10 @@
 import { pdb } from "bdsx/core";
 import { SYMOPT_UNDNAME } from "bdsx/common";
 import { ProcHacker } from "bdsx/prochacker";
-import { Actor, command, DimensionId, RawTypeId } from "bdsx";
+import { Actor, command, RawTypeId } from "bdsx";
 import { RelativeFloat, Vec3 } from "bdsx/bds/blockpos";
-import { connectionList } from "./playerlist";
-import { ActorWildcardCommandSelector, CommandPermissionLevel } from "bdsx/bds/command";
+import { ActorWildcardCommandSelector } from "bdsx/bds/command";
 import { int32_t } from "bdsx/nativetype";
-import { relative } from "node:path";
 
 // Set to 'true' to enable '/tdtp' command
 let tdtp: boolean = false
@@ -54,10 +52,10 @@ export function tdTeleport(actor: Actor, x:{value:number, is_relative?: boolean}
     if (dimensionId != undefined && dimensionId <= 2 && dimensionId >= 0) {
         dimId = parseInt(dimensionId.toFixed(0))
     } else { dimId = actor.getDimension()}
-    console.log(`Teleporting *${actor.getName()}* TO *${DimensionId[dimId]} @ ${pos.x} ${pos.y} ${pos.z}`)
+    // console.log(`Teleporting *${actor.getName()}* TO *${DimensionId[dimId]} @ ${pos.x} ${pos.y} ${pos.z}`)
     _tdtp(actor, pos, new Vec3(true), dimId);
 }
-
+// Register Command: '/tdtp <target> <x> <y> <z> <dimensionID>
 if (tdtp != false){
     command.register('tdtp', 'Trans-dimension teleportation', 1).overload((param, origin, output) => {
         console.log(origin);
