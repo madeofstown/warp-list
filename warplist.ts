@@ -3,8 +3,8 @@ import { bedrockServer, command, DimensionId, NetworkIdentifier, ServerPlayer } 
 import { FormButton, SimpleForm } from 'bdsx/bds/form';
 import { CxxString } from 'bdsx/nativetype';
 import fs = require('fs');
-import { connectionList } from './playerlist';  /* found @ https://github.com/randommouse/bdsx-scripts/blob/bdsx2/playerlist.ts */
-import { tdTeleport } from './tdtp';    /* found @ https://github.com/randommouse/bdsx-scripts/blob/bdsx2/tdtp.ts */
+import { connectionList } from './playerlist'; 
+import { tdTeleport } from './tdtp'; 
 
 let warpListGUI: boolean = true;    /* if 'true', uses a form-based GUI for '/warp list' command response */
 let dbFile = "warplist.json";   /* database file location */

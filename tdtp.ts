@@ -43,7 +43,7 @@ export function tdTeleport(actor: Actor, x:{value:number, is_relative?: boolean}
         pos.x = actor.getPosition().x + x.value
     } else {pos.x = x.value}
     if (y.is_relative == true) {
-        pos.y = actor.getPosition().y + y.value
+        pos.y = actor.getPosition().y + y.value - 1.62
     } else {pos.y = y.value}
     if (z.is_relative == true) {
         pos.z = actor.getPosition().z + z.value
@@ -58,7 +58,7 @@ export function tdTeleport(actor: Actor, x:{value:number, is_relative?: boolean}
 // Register Command: '/tdtp <target> <x> <y> <z> <dimensionID>
 if (tdtp != false){
     command.register('tdtp', 'Trans-dimension teleportation', 1).overload((param, origin, output) => {
-        console.log(origin);
+        // console.log(origin);
         for (const actor of param.target.newResults(origin)) {
             tdTeleport(actor, param.x, param.y, param.z, param.dimensionID); 
         }
