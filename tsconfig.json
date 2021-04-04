@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "inlineSourceMap": true,
     "importHelpers": true,
-    "experimentalDecorators": true
-  },
-  "declaration": true
+    "experimentalDecorators": true,
+    "declaration": true
+  }
 }
