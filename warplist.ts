@@ -1,6 +1,8 @@
 
-import { bedrockServer, command, DimensionId } from 'bdsx';
+import { bedrockServer, command, DimensionId, NetworkIdentifier, ServerPlayer } from 'bdsx';
+import { RelativeFloat } from 'bdsx/bds/blockpos';
 import { FormButton, SimpleForm } from 'bdsx/bds/form';
+import { Actor } from 'bdsx/native';
 import { CxxString } from 'bdsx/nativetype';
 import fs = require('fs');
 import { connectionList } from './playerlist';  /* found @ https://github.com/randommouse/bdsx-scripts/blob/bdsx2/playerlist.ts */
@@ -151,6 +153,8 @@ function warpDel(playerName: string, warpName: string){
 
 function warpTo(playerName: string, warpName: string){
     let originXuid = connectionList.nXXid.get(playerName);
+    let originNetID: NetworkIdentifier = connectionList.nXNet.get(playerName);
+    let originActor: ServerPlayer | null = originNetID.getActor();
     let dbObject = warpDB.find((obj: { xuid: string; }) => obj.xuid == originXuid);
 
     if (warpName != undefined && warpName != '' && warpName != null ) {
@@ -159,9 +163,15 @@ function warpTo(playerName: string, warpName: string){
             let warpObject = dbObject.warp.find((obj: { name: string; }) => obj.name == warpName);
 
             if (warpObject != undefined){
-                tdTeleport(playerName, warpObject.dimId, warpObject.x, warpObject.y, warpObject.z);
+                let x = { value: warpObject.x }
+                let y = { value: warpObject.y };
+                let z = { value: warpObject.z };
+                if (originActor){
+                tdTeleport(originActor, x, y, z, warpObject.dimId);
                 tellRaw(playerName, `§eWarped to §3§o${warpObject.name}§r§e\n    [§f${DimensionId[warpObject.dimId]} §e@ §4${warpObject.x.toFixed(1)} §a${warpObject.y.toFixed(1)} §9${warpObject.z.toFixed(1)}§e]`);
-
+                } else {
+                    tellRaw(playerName, `§cSTRANGE ERROR`)
+                }
             } else {
                 tellRaw(playerName, `§eNo warp called: §3§o${warpName}`);
             }
