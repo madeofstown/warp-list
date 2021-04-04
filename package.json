@@ -1,6 +1,6 @@
 {
   "name": "@rndmm.us/warp-list",
-  "version": "1.1.2",
+  "version": "1.2.101",
   "description": "A warp point system for BDSX. Trans-dimension teleport function and Playerlist Map API included.",
   "main": "index.js",
   "keywords": [],
