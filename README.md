@@ -19,6 +19,11 @@ Also includes trans-dimension teleport function and Playerlist Map API.
   * 1 = Nether
   * 2 = The End
 
+## Trans-dimension teleport function
+```ts
+function tdTeleport(actor: Actor, x: RelPos, y: RelPos, z: RelPos, dimensionId?: number)
+```
+
 ## Playerlist Map API
 ### A javascript map object that contains:
 * Name <--> NetworkID
