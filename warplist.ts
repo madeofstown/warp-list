@@ -1,10 +1,10 @@
 
-import { bedrockServer, command, DimensionId, NetworkIdentifier, ServerPlayer } from 'bdsx';
+import { bedrockServer, command, DimensionId, ServerPlayer } from 'bdsx';
 import { FormButton, SimpleForm } from 'bdsx/bds/form';
 import { CxxString } from 'bdsx/nativetype';
 import fs = require('fs');
 import { connectionList } from './playerlist'; 
-import { tdTeleport } from './tdtp'; 
+import { tdTeleport, RelPos } from './tdtp'; 
 
 let warpListGUI: boolean = true;    /* if 'true', uses a form-based GUI for '/warp list' command response */
 let dbFile = "warplist.json";   /* database file location */
@@ -151,8 +151,7 @@ function warpDel(playerName: string, warpName: string){
 
 function warpTo(playerName: string, warpName: string){
     let originXuid = connectionList.nXXid.get(playerName);
-    let originNetID: NetworkIdentifier = connectionList.nXNet.get(playerName);
-    let originActor: ServerPlayer | null = originNetID.getActor();
+    let originActor: ServerPlayer | null = connectionList.nXNet.get(playerName).getActor();
     let dbObject = warpDB.find((obj: { xuid: string; }) => obj.xuid == originXuid);
 
     if (warpName != undefined && warpName != '' && warpName != null ) {
@@ -161,14 +160,11 @@ function warpTo(playerName: string, warpName: string){
             let warpObject = dbObject.warp.find((obj: { name: string; }) => obj.name == warpName);
 
             if (warpObject != undefined){
-                let x = { value: warpObject.x }
-                let y = { value: warpObject.y };
-                let z = { value: warpObject.z };
                 if (originActor){
-                tdTeleport(originActor, x, y, z, warpObject.dimId);
-                tellRaw(playerName, `§eWarped to §3§o${warpObject.name}§r§e\n    [§f${DimensionId[warpObject.dimId]} §e@ §4${warpObject.x.toFixed(1)} §a${warpObject.y.toFixed(1)} §9${warpObject.z.toFixed(1)}§e]`);
+                    tdTeleport(originActor, {value: warpObject.x}, {value: warpObject.y}, {value: warpObject.z}, warpObject.dimId);
+                    tellRaw(playerName, `§eWarped to §3§o${warpObject.name}§r§e\n    [§f${DimensionId[warpObject.dimId]} §e@ §4${warpObject.x.toFixed(1)} §a${warpObject.y.toFixed(1)} §9${warpObject.z.toFixed(1)}§e]`);
                 } else {
-                    tellRaw(playerName, `§cSTRANGE ERROR`)
+                    tellRaw(playerName, `§cNO ACTOR FOR §3${playerName}`)
                 }
             } else {
                 tellRaw(playerName, `§eNo warp called: §3§o${warpName}`);

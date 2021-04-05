@@ -37,7 +37,11 @@ pdb.close();
 const _tdtp = hacker.js("TeleportCommand::teleport", RawTypeId.Void, null, Actor, Vec3, Vec3, RawTypeId.Int32);
 
 // Teleport function
-export function tdTeleport(actor: Actor, x:{value:number, is_relative?: boolean}, y:{value:number, is_relative?: boolean}, z:{value:number, is_relative?: boolean}, dimensionId?: number): void {
+/**
+ * @description Trans-dimension teleportation with relative coordinates
+ * @example tdTeleport(playerActor, { value: 10 }, { value: -10, is_relative: true }, new RelPos(10, false), 1 )
+ */
+export function tdTeleport(actor: Actor, x: RelPos, y: RelPos, z: RelPos, dimensionId?: number): void {
     let pos = new Vec3(true);
     if (x.is_relative == true) {
         pos.x = actor.getPosition().x + x.value
@@ -54,6 +58,23 @@ export function tdTeleport(actor: Actor, x:{value:number, is_relative?: boolean}
     } else { dimId = actor.getDimension()}
     // console.log(`Teleporting *${actor.getName()}* TO *${DimensionId[dimId]} @ ${pos.x} ${pos.y} ${pos.z}`)
     _tdtp(actor, pos, new Vec3(true), dimId);
+}
+
+/**
+ * @description Reltive position
+ * @example let x = new RelPos(0)
+ *          let y = new RelPos(20, true)
+ *          let z = new RelPos(100)
+ */
+ export class RelPos {
+    value: number
+    is_relative?: boolean
+    constructor(value: number, is_relative?: boolean){
+        this.value = value
+        if (is_relative != undefined) {
+            this.is_relative = is_relative
+        }
+    }
 }
 // Register Command: '/tdtp <target> <x> <y> <z> <dimensionID>
 if (tdtp != false){
