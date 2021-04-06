@@ -30,11 +30,11 @@ let tdtp: boolean = false
 // Open PDB and look for teleport function
 pdb.setOptions(SYMOPT_UNDNAME);
 const hacker = ProcHacker.load(`${__dirname}/pdbcache.ini`, [
-    "TeleportCommand::teleport"
+    "Player::teleportTo"
 ]);
 pdb.setOptions(0);
 pdb.close();
-const _tdtp = hacker.js("TeleportCommand::teleport", RawTypeId.Void, null, Actor, Vec3, Vec3, RawTypeId.Int32);
+const _tdtp = hacker.js("Player::teleportTo", RawTypeId.Void, null, Actor, Vec3, Vec3, RawTypeId.Int32);
 
 // Teleport function
 /**
