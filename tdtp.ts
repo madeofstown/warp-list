@@ -24,8 +24,8 @@ import { RelativeFloat, Vec3 } from "bdsx/bds/blockpos";
 import { ActorWildcardCommandSelector } from "bdsx/bds/command";
 import { int32_t } from "bdsx/nativetype";
 
-// Set to 'true' to enable '/tdtp' command
-let tdtp: boolean = false
+// Get "tdtp" command permission
+const perms = require(`${__dirname}/perms.json`);
 
 // Open PDB and look for teleport function
 pdb.setOptions(SYMOPT_UNDNAME);
@@ -82,11 +82,9 @@ export function tdTeleport(actor: Actor, x: RelPos, y: RelPos, z: RelPos, dimens
     }
 }
 // Register Command: '/tdtp <target> <x> <y> <z> <dimensionID>
-if (tdtp != false){
-    command.register('tdtp', 'Trans-dimension teleportation', 1).overload((param, origin, output) => {
+    command.register('tdtp', 'Trans-dimension teleportation', perms.tdtp).overload((param, origin, output) => {
         // console.log(origin);
         for (const actor of param.target.newResults(origin)) {
             tdTeleport(actor, param.x, param.y, param.z, param.dimensionID); 
         }
     }, {target: ActorWildcardCommandSelector, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, dimensionID: int32_t});
-}
