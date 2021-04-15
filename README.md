@@ -16,6 +16,7 @@ Also includes trans-dimension teleport function and Playerlist Map API.
 * `/warplist` - shows your warp points with a clickable form-based list
   * For non-clickable text-based list change variable in perms.json
 * `/warpset <"warp name">` - set a warp point (use "" for names with spaces)
+* `/warpadd <playerName> <"warp name"> <x> <y> <z> <dimensionId>` - Add a warp point for any player at any position
 * `/warpdel <"warp name">` - delete a warp point
 * `/warpedit <"warp name"> ["new warp name"] [newListPos]` - Edit a warp point's name or position in list (position starts at 1)
 * `/warpto <"warp name">` - teleport to a warp point in your list
@@ -42,7 +43,8 @@ The command permissions can be changed in `{__dirname}/perms.json`. The defaults
     "warpTo": 0,
     "home": 0,
     "warpEdit": 1,
-    "tdtp": 1
+    "tdtp": 1,
+    "warpAdd": 1
 }
 ```
 * Set `"formGUI"` to false for text only mode

@@ -6,5 +6,6 @@
     "warpTo": 0,
     "home": 0,
     "warpEdit": 1,
-    "tdtp": 1
+    "tdtp": 1,
+    "warpAdd": 1
 }

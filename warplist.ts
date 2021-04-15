@@ -1,6 +1,8 @@
 
-import { bedrockServer, command, DimensionId, ServerPlayer } from 'bdsx';
-import { CommandPermissionLevel } from 'bdsx/bds/command';
+import { Actor, bedrockServer, command, DimensionId, ServerPlayer } from 'bdsx';
+import { RelativeFloat, Vec3 } from 'bdsx/bds/blockpos';
+import { ActorWildcardCommandSelector, CommandPermissionLevel } from 'bdsx/bds/command';
+import { Dimension } from 'bdsx/bds/dimension';
 import { CustomForm, FormButton, FormDropdown, FormInput, FormStepSlider, ModalForm, SimpleForm } from 'bdsx/bds/form';
 import { CxxString, int32_t } from 'bdsx/nativetype';
 import fs = require('fs');
@@ -35,7 +37,7 @@ bedrockServer.close.on(() => {
 // Register Commands
 
 // /warplist
-command.register('warplist', '§6List§7 your Warp Points.', perms.warpList).overload((param, origin, output) => {
+command.register('warplist', '§bList§7 your Warp Points.', perms.warpList).overload((param, origin, output) => {
     if (perms.formGUI == true) {
         warpListForm(origin.getName());
     } else {
@@ -43,7 +45,7 @@ command.register('warplist', '§6List§7 your Warp Points.', perms.warpList).ove
     }
 },{});
 
-// /warpedit <warpName> <newWarpName?> <newListPos?>
+// /warpedit <warpName> [newWarpName] [newListPos]
 command.register('warpedit', '§9Edit§7 a Warp Point.', perms.warpEdit).overload((param, origin, output) => {
     let listIndex = param.newListPos;
     let newName = param.newWarpName;
@@ -67,22 +69,34 @@ command.register('warpdel', '§cDelete§7 a Warp Point.', perms.warpDel).overloa
 },{warpName: CxxString});
 
 // /warpto <warpName>
-command.register('warpto', '§aWarp§7 to a Warp Point.', perms.warpTo).overload((param, origin, output) => {
+command.register('warpto', '§aWarp§7 to a Warp Point.', perms.warpTo).overload((param, origin, _output) => {
     if(param.warpName != undefined) { warpTo(origin.getName(), param.warpName) };
 },{warpName: CxxString});
 
 // /warpset <warpName>
-command.register('warpset', '§eSet§7 a Warp Point.', perms.warpSet).overload((param, origin, output) => {
-    if(param.warpName != undefined) { warpSet(origin.getName(), param.warpName) };
+command.register('warpset', '§eSet§7 a Warp Point.', perms.warpSet).overload((param, origin, _output) => {
+    let cmdPos: Vec3 = origin.getWorldPosition()
+    let dimId = origin.getDimension().getDimensionId()
+    warpAdd(origin.getName(), param.warpName, new RelPos(cmdPos.x), new RelPos(cmdPos.y), new RelPos(cmdPos.z), dimId)
 },{warpName: CxxString});
 
+// /warpadd <playerName> <warpName> <x> <y> <z> <dimensionId>
+command.register('warpadd', '§6Add§7 a Warp Point for any player at any position.', perms.warpAdd).overload((param, origin, _output) => {
+    for (const actor of param.playerName.newResults(origin)) {
+        let playerName = actor.getName();
+        warpAdd(playerName, param.warpName, param.x, param.y, param.z, param.DimensionId)}
+},{playerName: ActorWildcardCommandSelector, warpName: CxxString, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, DimensionId: int32_t}) 
+
 // /sethome
-command.register('sethome', `§eSet§7 your ${homename}§r§o§7 Warp Point.`, perms.setHome).overload((param, origin, output)=>{
-    warpSet(origin.getName(), homename);
+command.register('sethome', `§eSet§7 your ${homename}§r§o§7 Warp Point.`, perms.setHome).overload((_param, origin, _output)=>{
+    let cmdPos = origin.getWorldPosition()
+    let dimId = origin.getDimension().getDimensionId()
+    console.log(dimId)
+    warpAdd(origin.getName(), homename, new RelPos(cmdPos.x), new RelPos(cmdPos.y), new RelPos(cmdPos.z), dimId)
 },{});
 
 // /home
-command.register('home', `§aWarp§7 to your ${homename}§r§o§7 Warp Point.`, perms.home).overload((param, origin, output)=>{
+command.register('home', `§aWarp§7 to your ${homename}§r§o§7 Warp Point.`, perms.home).overload((_param, origin, _output)=>{
     warpTo(origin.getName(), homename);
 },{});
 
@@ -99,17 +113,31 @@ function saveToFile(dbObject: object = warpDB, file: string = dbFile){
     });
 }
 
-function warpSet(playerName: string, warpName: string){
-    let originActor = connectionList.nXNet.get(playerName).getActor();
-    let originEntity = connectionList.n2Ent.get(playerName);
-    let originPosition = system.getComponent(originEntity, "minecraft:position");
+function warpAdd(playerName: string, warpName: string, x: RelPos, y: RelPos, z: RelPos, dimensionId?: DimensionId,){
+    let originActor: Actor = connectionList.nXNet.get(playerName).getActor();
     let originXuid = connectionList.nXXid.get(playerName);
-    let dimId = originActor.getDimension();
-    let xPos = originPosition!.data.x;
-    let yPos = originPosition!.data.y;
-    let zPos = originPosition!.data.z;
     let dbObject = warpDB.find((obj: { xuid: string; }) => obj.xuid == originXuid);
+    let xPos: number;
+    let yPos: number;
+    let zPos: number;
+    let dimId: number;
+
+    if (x.is_relative == true) {
+        xPos = originActor.getPosition().x + x.value
+    } else {xPos = x.value}
+    if (y.is_relative == true) {
+        yPos = originActor.getPosition().y + y.value - 1.62
+    } else {yPos = y.value}
+    if (z.is_relative == true) {
+        zPos= originActor.getPosition().z + z.value
+    } else {zPos= z.value}
+    
+    if (dimensionId != undefined && dimensionId >= 0 && dimensionId <= 2) {
+        dimId = parseInt(dimensionId.toFixed(0))
+    } else { dimId = originActor.getDimensionId()}
+
     let warpEntry = new WarpDBEntry(warpName, dimId, xPos, yPos, zPos);
+    
     if (warpName != undefined && warpName != '' && warpName != null ) {
         tellRaw(playerName, '§e§l[WARP LIST]');
         if (dbObject != undefined){
@@ -141,6 +169,7 @@ function warpSet(playerName: string, warpName: string){
     }
 }
 
+
 function warpEdit(playerName: string, warpName: string, newWarpName: string = warpName, newListIndex?: number, formConfirm?: boolean){
     let originXuid = connectionList.nXXid.get(playerName);
     let dbObject = warpDB.find((obj: { xuid: string; }) => obj.xuid == originXuid);
@@ -159,7 +188,6 @@ function warpEdit(playerName: string, warpName: string, newWarpName: string = wa
                     delConfirmForm.setButtonConfirm("§9§lEDIT");
                     delConfirmForm.sendTo(originNetID, (data, originNetID)=>{
                         if (data.response !== undefined && data.response !== null && data.response !== false){
-                            console.log(data.response);
                             tellRaw(playerName, '§e§l[WARP LIST]');
                             if (newWarpName && newWarpName != '' && newWarpName != null && warpName != newWarpName){
                                 if (warpName != newWarpName && (warpName == homename || newWarpName == homename)) {
@@ -381,7 +409,6 @@ function warpListForm(playerName: string) {
             }
             warpListForm.sendTo(playerNetID, (data, playerNetID) => {
                 if (data.response !== undefined && data.response !== null){
-                // warpTo(playerName, dbObject.warp[data.response].name);
                 warpItemForm(playerName, data.response);
                 }
             })
@@ -413,7 +440,7 @@ class PlayerDBEntry {
 
 class WarpDBEntry {
     [key: string]: any
-    constructor(warpName: string, dimensionId: number, xPos: number, yPos: number, zPos: number){
+    constructor(warpName: string, dimensionId: DimensionId, xPos: number, yPos: number, zPos: number){
         this.name = warpName;
         this.dimId = dimensionId;
         this.x = xPos;
