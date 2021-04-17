@@ -82,10 +82,27 @@ command.register('warpset', '§eSet§7 a Warp Point.', perms.warpSet).overload((
 
 // /warpadd <playerName> <warpName> <x> <y> <z> <dimensionId>
 command.register('warpadd', '§6Add§7 a Warp Point for any player at any position.', perms.warpAdd).overload((param, origin, _output) => {
+    let cmdPos = origin.getWorldPosition();
+    let xPos: RelPos
+    let yPos: RelPos;
+    let zPos: RelPos;
+    let dimId: DimensionId = origin.getDimension().getDimensionId();
+    if (param.x.is_relative == true) {
+        xPos = new RelPos(cmdPos.x + param.x.value)
+    } else {xPos = new RelPos(param.x.value)}
+    if (param.y.is_relative == true) {
+        yPos = new RelPos(cmdPos.y + param.y.value - 1.62)
+    } else {yPos = new RelPos(param.y.value)}
+    if (param.z.is_relative == true) {
+        zPos= new RelPos(cmdPos.z + param.z.value)
+    } else {zPos = new RelPos(param.z.value)}
+    if (param.DimensionId !== undefined) {
+        dimId = param.DimensionId
+    }
     for (const actor of param.playerName.newResults(origin)) {
         let playerName = actor.getName();
-        warpAdd(playerName, param.warpName, param.x, param.y, param.z, param.DimensionId)}
-},{playerName: ActorWildcardCommandSelector, warpName: CxxString, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, DimensionId: int32_t}) 
+        warpAdd(playerName, param.warpName, xPos, yPos, param.z, param.DimensionId)}
+},{playerName: ActorWildcardCommandSelector, warpName: CxxString, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, DimensionId: [int32_t, true]}) 
 
 // /sethome
 command.register('sethome', `§eSet§7 your ${homename}§r§o§7 Warp Point.`, perms.setHome).overload((_param, origin, _output)=>{
