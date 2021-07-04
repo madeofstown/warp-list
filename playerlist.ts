@@ -10,8 +10,13 @@
 //                  (removes players from map when they leave)                  //
 //------------------------------------------------------------------------------//
 
-import { Actor, nethook, NetworkIdentifier, PacketId } from "bdsx";
 import colors = require('colors');
+import { Actor } from '../bdsx/bds/actor';
+import { NetworkIdentifier } from '../bdsx/bds/networkidentifier';
+import { MinecraftPacketIds } from '../bdsx/bds/packetids';
+import { events } from '../bdsx/event';
+import { nethook } from '../bdsx/nethook';
+
 
 export var connectionList = {
     nXNet: new Map(),   /* Name to NetworkId & NetworkId to Name */
@@ -23,7 +28,7 @@ let system = server.registerSystem(0, 0);
 
 
 //Read Login Packet and Add Player To Connection List
-nethook.after(PacketId.Login).on((ptr, networkIdentifier, packetId) => {
+events.packetAfter(MinecraftPacketIds.Login).on((ptr, networkIdentifier, packetId) => {
     let ip = networkIdentifier.getAddress();
     let cert = ptr.connreq.cert;
     let xuid = cert.getXuid();
@@ -52,7 +57,7 @@ system.listenForEvent('minecraft:entity_created', ev => {
 });
 
 //Read Disconnect Event and Remove Player From Connection List
-NetworkIdentifier.close.on(networkIdentifier => {
+events.networkDisconnected.on(networkIdentifier => {
     let username = connectionList.nXNet.get(networkIdentifier);
     let xuid = connectionList.nXXid.get(username);
     connectionList.nXNet.delete(networkIdentifier);
