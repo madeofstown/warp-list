@@ -1,6 +1,7 @@
-import { bedrockServer } from "bdsx";
+import { events } from "../bdsx/event";
 
-bedrockServer.open.on(()=>{
+
+events.serverOpen.on(()=>{
     require('./playerlist');
     require('./tdtp');
     require('./warplist')

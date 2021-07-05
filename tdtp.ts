@@ -16,28 +16,28 @@
 // https://github.com/Rjlintkh/bdsx-scripts/blob/main/scripts/minecraftFunctions.ts  //
 //------------------------------------------------------------------------------//
 
-import { pdb, AllocatedPointer } from "bdsx/core";
-import { SYMOPT_UNDNAME } from "bdsx/common";
+import { pdb, AllocatedPointer, StaticPointer } from "bdsx/core";
 import { ProcHacker } from "bdsx/prochacker";
-import { Actor, command, RawTypeId, StaticPointer } from "bdsx";
 import { RelativeFloat, Vec3 } from "bdsx/bds/blockpos";
-import { ActorWildcardCommandSelector } from "bdsx/bds/command";
-import { int32_t } from "bdsx/nativetype";
+import { command } from "../bdsx/command";
+import { int32_t, void_t } from "bdsx/nativetype";
+import { UNDNAME_NAME_ONLY } from "../bdsx/dbghelp";
+import { Actor } from "../bdsx/bds/actor";
+import { ActorWildcardCommandSelector } from "../bdsx/bds/command";
 
 // Get "tdtp" command permission
 const perms = require(`${__dirname}/perms.json`);
 
 // Open PDB and look for teleport function
-pdb.setOptions(SYMOPT_UNDNAME);
 const hacker = ProcHacker.load(`${__dirname}/pdbcache.ini`, [
     "TeleportCommand::computeTarget",
     "TeleportCommand::applyTarget",
-]);
+], UNDNAME_NAME_ONLY);
 pdb.setOptions(0);
 pdb.close();
 
-const computeTarget = hacker.js("TeleportCommand::computeTarget", RawTypeId.Void, null, StaticPointer, Actor, Vec3, Vec3, RawTypeId.Int32);
-const applyTarget = hacker.js("TeleportCommand::applyTarget", RawTypeId.Void, null, Actor, StaticPointer);
+const computeTarget = hacker.js("TeleportCommand::computeTarget", void_t, null, StaticPointer, Actor, Vec3, Vec3, int32_t);
+const applyTarget = hacker.js("TeleportCommand::applyTarget", void_t, null, Actor, StaticPointer);
 
 // Teleport function
 /**
@@ -59,7 +59,7 @@ export function tdTeleport(actor: Actor, x: RelPos, y: RelPos, z: RelPos, dimens
     let dimId: number
     if (dimensionId != undefined && dimensionId <= 2 && dimensionId >= 0) {
         dimId = parseInt(dimensionId.toFixed(0))
-    } else { dimId = actor.getDimension()}
+    } else { dimId = actor.getDimension().getDimensionId()}
     // console.log(`Teleporting *${actor.getName()}* TO *${DimensionId[dimId]} @ ${pos.x} ${pos.y} ${pos.z}`)
     computeTarget(alloc, actor, pos, new Vec3(true), dimId);
     applyTarget(actor, alloc);
@@ -85,6 +85,8 @@ export function tdTeleport(actor: Actor, x: RelPos, y: RelPos, z: RelPos, dimens
     command.register('tdtp', 'Trans-dimension teleportation', perms.tdtp).overload((param, origin, output) => {
         // console.log(origin);
         for (const actor of param.target.newResults(origin)) {
-            tdTeleport(actor, param.x, param.y, param.z, param.dimensionID); 
+            tdTeleport(actor, param.x, param.y, param.z, param.dimensionID);
         }
     }, {target: ActorWildcardCommandSelector, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, dimensionID: int32_t});
+
+

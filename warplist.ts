@@ -1,14 +1,17 @@
 
-import { Actor, bedrockServer, command, DimensionId, NetworkIdentifier, ServerPlayer } from 'bdsx';
+
 import { RelativeFloat, Vec3 } from 'bdsx/bds/blockpos';
 import { ActorWildcardCommandSelector } from 'bdsx/bds/command';
 import { CustomForm, FormButton, FormDropdown, FormInput, FormStepSlider, ModalForm, SimpleForm } from 'bdsx/bds/form';
-import { Player } from 'bdsx/bds/player';
+import { Player, ServerPlayer } from 'bdsx/bds/player';
 import { events } from 'bdsx/event';
 import { CxxString, int32_t } from 'bdsx/nativetype';
 import fs = require('fs');
-import { connectionList } from './playerlist'; 
-import { tdTeleport, RelPos } from './tdtp'; 
+import { DimensionId } from '../bdsx/bds/actor';
+import { NetworkIdentifier } from '../bdsx/bds/networkidentifier';
+import { command } from '../bdsx/command';
+import { connectionList } from './playerlist';
+import { tdTeleport, RelPos } from './tdtp';
 const perms = require(`${__dirname}/perms.json`);
 let dbFile = "warplist.json";   /* database file location */
 let warpDB: any = []
@@ -67,7 +70,7 @@ command.register('warpedit', '§9Edit§7 a Warp Point.', perms.warpEdit).overloa
     if (param.newListPos !== undefined) { listIndex = param.newListPos - 1 };
     if (param.newWarpName !== undefined || param.newListPos !== undefined) {
         warpEdit(origin.getName(), param.warpName, newName, listIndex, perms.formGUI);
-    } else if (perms.formGUI == true) { 
+    } else if (perms.formGUI == true) {
         let originXuid = connectionList.nXXid.get(origin.getName());
         let dbObject = warpDB.find((obj: { xuid: string; }) => obj.xuid == originXuid);
         let dbIndex = warpDB.indexOf(dbObject);
@@ -109,7 +112,7 @@ command.register('warpset', '§eSet§7 a Warp Point.', perms.warpSet).overload((
         return 0
     }
     return 0
-    
+
 },{warpName: CxxString});
 
 // /warpadd <playerName> <warpName> <x> <y> <z> <dimensionId>
@@ -134,7 +137,7 @@ command.register('warpadd', '§6Add§7 a Warp Point for any player at any positi
     for (const actor of param.playerName.newResults(origin)) {
         let playerName = actor.getName();
         warpAdd(playerName, param.warpName, xPos, yPos, param.z, param.DimensionId)}
-},{playerName: ActorWildcardCommandSelector, warpName: CxxString, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, DimensionId: [int32_t, true]}) 
+},{playerName: ActorWildcardCommandSelector, warpName: CxxString, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, DimensionId: [int32_t, true]})
 
 // /sethome
 command.register('sethome', `§eSet§7 your ${homename}§r§o§7 Warp Point.`, perms.setHome).overload((_param, origin, _output)=>{
@@ -163,7 +166,7 @@ command.register('home', `§aWarp§7 to your ${homename}§r§o§7 Warp Point.`, 
         return 0
     }
     return 0
-    
+
 },{});
 
 // Functions
@@ -206,13 +209,13 @@ function warpAdd(playerName: string, warpName: string, x: RelPos, y: RelPos, z: 
     if (z.is_relative == true) {
         zPos= originActor.getPosition().z + z.value
     } else {zPos= z.value}
-    
+
     if (dimensionId != undefined && dimensionId >= 0 && dimensionId <= 2) {
         dimId = parseInt(dimensionId.toFixed(0))
     } else { dimId = originActor.getDimensionId()}
 
     let warpEntry = new WarpDBEntry(warpName, dimId, xPos, yPos, zPos);
-    
+
     if (warpName != undefined && warpName != '' && warpName != null ) {
         tellRaw(playerName, '§e§l[WARP LIST]');
         if (playerObj?.playerDB != undefined){
@@ -251,7 +254,7 @@ function warpEdit(playerName: string, warpName: string, newWarpName: string = wa
     let warpObject = dbObject.warp.find((obj: { name: string; }) => obj.name == warpName);
     let warpIndex: number = warpDB[dbIndex].warp.indexOf(warpObject);
     let newWarpNameObject = dbObject.warp.find((obj: { name: string; }) => obj.name == newWarpName);
-    
+
     if (warpName != undefined && warpName != '' && warpName != null ) {
         if (dbObject != undefined){
             if (warpObject != undefined){
@@ -286,8 +289,8 @@ function warpEdit(playerName: string, warpName: string, newWarpName: string = wa
                                     } else if (newListIndex > warpIndex) {
                                         warpDB[dbIndex].warp.splice(newListIndex + 1, 0, newWarpNameObject);
                                         warpDB[dbIndex].warp.splice(warpIndex, 1);
-                                        tellRaw(playerName, `§3§o${warpDB[dbIndex].warp[newListIndex].name} §e@ position:\n    ${newListIndex + 1}`); 
-                                    }        
+                                        tellRaw(playerName, `§3§o${warpDB[dbIndex].warp[newListIndex].name} §e@ position:\n    ${newListIndex + 1}`);
+                                    }
                                 } else {
                                     tellRaw(playerName, `§3§o${warpDB[dbIndex].warp[newListIndex].name} §e@ position:\n    ${newListIndex + 1}`);
                                 }
@@ -296,7 +299,7 @@ function warpEdit(playerName: string, warpName: string, newWarpName: string = wa
                             saveToFile();
                         }
                     });
-                } else if (formConfirm == false) { 
+                } else if (formConfirm == false) {
                     tellRaw(playerName, '§e§l[WARP LIST]');
                     if (newWarpName && newWarpName != '' && newWarpName != null && warpName != newWarpName){
                         if (warpName != newWarpName && (warpName == homename || newWarpName == homename)) {
@@ -321,8 +324,8 @@ function warpEdit(playerName: string, warpName: string, newWarpName: string = wa
                             } else if (newListIndex > warpIndex) {
                                 warpDB[dbIndex].warp.splice(newListIndex + 1, 0, newWarpNameObject);
                                 warpDB[dbIndex].warp.splice(warpIndex, 1);
-                                tellRaw(playerName, `§3§o${warpDB[dbIndex].warp[newListIndex].name} §e@ position:\n    ${newListIndex + 1}`); 
-                            }        
+                                tellRaw(playerName, `§3§o${warpDB[dbIndex].warp[newListIndex].name} §e@ position:\n    ${newListIndex + 1}`);
+                            }
                         } else {
                             tellRaw(playerName, `§3§o${warpDB[dbIndex].warp[newListIndex].name} §e@ position:\n    ${newListIndex + 1}`);
                         }
@@ -350,7 +353,7 @@ function warpDel(playerName: string, warpName: string, formConfirm?: boolean){
     let dbIndex: number = warpDB.indexOf(dbObject);
     let warpObject = dbObject.warp.find((obj: { name: string; }) => obj.name == warpName);
     let warpIndex: number = warpDB[dbIndex].warp.indexOf(warpObject);
-    
+
     if (warpName != undefined && warpName != '' && warpName != null ) {
         if (dbObject != undefined){
             if (warpObject != undefined){
@@ -443,7 +446,7 @@ function warpItemForm(playerName: string, warpIndex: number) {
     let playerXuid = connectionList.nXXid.get(playerName);
     let playerNetID = connectionList.nXNet.get(playerName);
     let dbObject = warpDB.find((obj: { xuid: string; }) => obj.xuid == playerXuid);
-    if (dbObject.warp[warpIndex]) { 
+    if (dbObject.warp[warpIndex]) {
         let indexArray: string[] = [];
         for (let i = 0; i < dbObject.warp.length; i++){
             indexArray.push(`${i + 1}`)
@@ -464,10 +467,10 @@ function warpItemForm(playerName: string, warpIndex: number) {
                 if (data.response[2] == 2) {
                     warpDel(playerName, dbObject.warp[warpIndex].name, true);
                 }
-            } 
-        })     
+            }
+        })
     }
-    
+
 }
 
 
@@ -511,7 +514,7 @@ Player.prototype.getPlayerDB = function() {
             playerDB: dbObj,
             index: dbInd
         }
-    } else {return undefined}    
+    } else {return undefined}
 }
 
 class PlayerDBEntry {
