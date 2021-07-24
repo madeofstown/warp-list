@@ -1,4 +1,4 @@
-import { Actor } from "bdsx";
+import { Actor } from "bdsx/bds/actor";
 /**
  * @description Trans-dimension teleportation with relative coordinates
  * @example tdTeleport(playerActor, { value: 10 }, { value: -10, is_relative: true }, new RelPos(10, false), 1 )
