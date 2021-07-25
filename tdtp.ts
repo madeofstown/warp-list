@@ -19,11 +19,9 @@
 import { command } from "bdsx/command";
 import { Actor } from "bdsx/bds/actor";
 import { RelativeFloat, Vec3 } from "bdsx/bds/blockpos";
-import { command } from "../bdsx/command";
+import { ActorWildcardCommandSelector } from "bdsx/bds/command";
 import { int32_t, void_t } from "bdsx/nativetype";
-import { UNDNAME_NAME_ONLY } from "../bdsx/dbghelp";
-import { Actor } from "../bdsx/bds/actor";
-import { ActorWildcardCommandSelector } from "../bdsx/bds/command";
+
 
 // Get "tdtp" command permission
 const perms = require(`${__dirname}/perms.json`);

@@ -14,11 +14,7 @@ import { MinecraftPacketIds } from "bdsx/bds/packetids";
 import { events } from "bdsx/event";
 import { Actor } from "bdsx/bds/actor";
 import colors = require('colors');
-import { Actor } from '../bdsx/bds/actor';
-import { NetworkIdentifier } from '../bdsx/bds/networkidentifier';
-import { MinecraftPacketIds } from '../bdsx/bds/packetids';
-import { events } from '../bdsx/event';
-import { nethook } from '../bdsx/nethook';
+
 
 
 export var connectionList = {
