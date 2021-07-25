@@ -19,8 +19,11 @@
 import { command } from "bdsx/command";
 import { Actor } from "bdsx/bds/actor";
 import { RelativeFloat, Vec3 } from "bdsx/bds/blockpos";
-import { ActorWildcardCommandSelector } from "bdsx/bds/command";
-import { int32_t } from "bdsx/nativetype";
+import { command } from "../bdsx/command";
+import { int32_t, void_t } from "bdsx/nativetype";
+import { UNDNAME_NAME_ONLY } from "../bdsx/dbghelp";
+import { Actor } from "../bdsx/bds/actor";
+import { ActorWildcardCommandSelector } from "../bdsx/bds/command";
 
 // Get "tdtp" command permission
 const perms = require(`${__dirname}/perms.json`);
@@ -73,3 +76,5 @@ export function tdTeleport(actor: Actor, x: RelPos, y: RelPos, z: RelPos, dimens
             tdTeleport(actor, param.x, param.y, param.z, param.dimensionID);
         }
     }, {target: ActorWildcardCommandSelector, x: RelativeFloat, y: RelativeFloat, z: RelativeFloat, dimensionID: int32_t});
+
+
