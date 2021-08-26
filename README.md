@@ -33,9 +33,10 @@ Also includes trans-dimension teleport function and Playerlist Map API.
 
 
 ## Command Permissions
-The command permissions can be changed in `{__dirname}/perms.json`. The defaults are:
+The command permissions can be changed in `node_modules/@bdsx/warp-list/perms.json`. The defaults are:
 ```json
 {
+    "homename": "§5HOME",
     "formGUI": true,
     "warpList": 0,
     "warpSet": 1,

@@ -1,6 +1,6 @@
 {
   "name": "@bdsx/warp-list",
-  "version": "2.0.002",
+  "version": "2.0.003",
   "description": "A warp point system for BDSX.",
   "main": "index.js",
   "keywords": [],
