@@ -168,7 +168,7 @@ function warpTo(playerActor: Player, warpName: string) {
                 if (playerActor.getDimensionId() == warpEntry.dimId) {
                 warpMsg(playerActor, `§eWarped to §3§o${warpEntry.name}§r§e`
                     + `\n    [§f${DimensionId[warpEntry.dimId]} §e@ §4${warpEntry.x.toFixed(1)} §a${warpEntry.y.toFixed(1)} §9${warpEntry.z.toFixed(1)}§e]`);
-                bedrockServer.executeCommand(`execute ${playerActor.getName()} ~ ~ ~ teleport @s ${warpEntry.x} ${warpEntry.y} ${warpEntry.z}`);
+                bedrockServer.executeCommand(`execute "${playerActor.getName()}" ~ ~ ~ teleport @s ${warpEntry.x} ${warpEntry.y} ${warpEntry.z}`);
                 } else if(playerActor.getDimensionId() != warpDB.getPlayer(playerActor)?.getWarp(warpName)?.dimId) {
                 warpMsg(playerActor, `§eWarped to §3§o${warpEntry.name}§r§e`
                     + `\n    [§f${DimensionId[warpEntry.dimId]} §e@ §4${warpEntry.x.toFixed(1)} §a${warpEntry.y.toFixed(1)} §9${warpEntry.z.toFixed(1)}§e]`);
